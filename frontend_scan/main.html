@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Receipt Manager Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel=""stylesheet" href="main.css">
+
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div class="container mx-auto px-4 py-8 max-w-6xl">
+    <!-- Header -->
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-800">Receipt Manager</h1>
+      <p class="text-gray-600">Upload and manage your receipts in one place</p>
+    </header>
+
+    <!-- Upload Section -->
+    <section class="mb-10 bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-xl font-semibold mb-4 text-gray-700">Upload Receipt</h2>
+      
+      <div id="upload-container">
+        <!-- Upload Drop Zone -->
+        <div id="drop-zone" class="drop-zone p-8 text-center cursor-pointer mb-4">
+          <div class="flex flex-col items-center justify-center space-y-4">
+            <i class="fas fa-cloud-upload-alt text-4xl text-blue-500"></i>
+            <p class="text-gray-600">Drag & drop your receipt image here</p>
+            <p class="text-gray-500 text-sm">or</p>
+            <button id="file-picker-btn" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+              Browse Files
+            </button>
+            <input type="file" id="file-input" class="hidden" accept="image/*">
+            <p class="text-xs text-gray-500">Supported formats: JPG, PNG, PDF</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Image Preview (Hidden by default) -->
+      <div id="image-preview-container" class="hidden flex flex-col items-center">
+        <h3 class="text-lg font-medium mb-3 text-gray-700">Receipt Preview</h3>
+        <div class="relative w-full mb-4">
+          <img id="preview-image" src="" alt="Receipt preview" class="image-preview mx-auto rounded-md shadow-sm border border-gray-200">
+          <div id="loading-overlay" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80 rounded-md">
+            <div class="flex flex-col items-center">
+              <i class="fas fa-spinner spinner text-3xl text-blue-500 mb-2"></i>
+              <p class="text-gray-700">Extracting receipt details...</p>
+            </div>
+          </div>
+        </div>
+        <button id="cancel-upload-btn" class="text-gray-600 hover:text-gray-800 text-sm underline">
+          Cancel and upload another
+        </button>
+      </div>
+    </section>
+
+    <!-- Receipts List Section -->
+    <section class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-semibold text-gray-700">My Receipts</h2>
+        <button id="refresh-btn" class="flex items-center space-x-2 text-blue-500 hover:text-blue-600 transition duration-200">
+          <i class="fas fa-sync-alt"></i>
+          <span>Refresh</span>
+        </button>
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="py-12 text-center">
+        <i class="fas fa-receipt text-5xl text-gray-300 mb-4"></i>
+        <h3 class="text-xl font-medium text-gray-600 mb-2">No receipts yet</h3>
+        <p class="text-gray-500 mb-4">Upload your first receipt to get started</p>
+      </div>
+
+      <!-- Receipt Grid -->
+      <div id="receipts-grid" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Receipt cards will be dynamically inserted here -->
+      </div>
+      
+      <!-- Loading State -->
+      <div id="loading-receipts" class="hidden py-12 text-center">
+        <i class="fas fa-spinner spinner text-4xl text-blue-500 mb-4"></i>
+        <p class="text-gray-600">Loading your receipts...</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- Confirmation Modal (Hidden by default) -->
+  <div id="confirmation-modal" class="modal hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-auto">
+      <div class="p-6">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Confirm Receipt Details</h3>
+        
+        <div class="flex mb-6">
+          <div class="flex-shrink-0 mr-4">
+            <img id="modal-receipt-image" src="" alt="Receipt thumbnail" class="h-24 w-24 object-cover rounded-md border border-gray-200">
+          </div>
+          <div class="flex-grow">
+            <p class="text-sm text-gray-500 mb-1">Please verify the extracted information</p>
+            <p id="modal-file-name" class="text-gray-700 font-medium truncate"></p>
+          </div>
+        </div>
+        
+        <form id="receipt-form">
+          <div class="space-y-4">
+            <div>
+              <label for="vendor-name" class="block text-sm font-medium text-gray-700 mb-1">Vendor</label>
+              <input type="text" id="vendor-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div id="itemsList" class="space-y-2 mb-4"></div>
+
+            <button id="addItemBtn" class="bg-blue-500 text-white px-3 py-1 rounded">Add Item</button>
+
+            
+        <div class="flex items-center space-x-3 mt-4">
+          <button id="recalculate-btn" type="button" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+            Recalculate Total
+          </button>
+          <span id="recalculated-total" class="text-gray-700 font-medium">Total: $0.00</span>
+        </div>
+
+            <div>
+              <label for="total-cost" class="block text-sm font-medium text-gray-700 mb-1">Total Cost</label>
+              <input type="text" id="total-cost" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div>
+              <label for="receipt-date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+              <input type="date" id="receipt-date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div id="building-name-field">
+              <label for="building-name" class="block text-sm font-medium text-gray-700 mb-1">Building Name <span class="text-red-500">*</span></label>
+              <input type="text" id="building-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+              <p class="building-name-error text-sm text-red-500 mt-1">Please enter a building name</p>
+            </div>
+          </div>
+          
+          <div class="flex justify-end space-x-3 mt-6">
+            <button type="button" id="modal-cancel-btn" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500">
+              Cancel
+            </button>
+            <button type="submit" id="modal-confirm-btn" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              Confirm
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Banner (Hidden by default) -->
+  <div id="error-banner" class="hidden fixed top-4 right-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-md max-w-md z-50">
+    <div class="flex items-start">
+      <div class="flex-shrink-0">
+        <i class="fas fa-exclamation-circle text-red-500 mt-0.5"></i>
+      </div>
+      <div class="ml-3">
+        <p id="error-message" class="text-sm">Error message will appear here</p>
+      </div>
+      <button id="close-error-btn" class="ml-auto -mr-1 text-red-500 hover:text-red-700">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+
+  <script id="app-script" src="main.js"></script>
+</body>
+</html>

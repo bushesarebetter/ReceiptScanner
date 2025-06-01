@@ -1,0 +1,40 @@
+  .drop-zone {
+      border: 2px dashed #718096;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+    .drop-zone.active {
+      border-color: #4299e1;
+      background-color: rgba(66, 153, 225, 0.1);
+    }
+    .receipt-card {
+      transition: transform 0.2s ease;
+    }
+    .receipt-card:hover {
+      transform: translateY(-4px);
+    }
+    .image-preview {
+      max-height: 300px;
+      object-fit: contain;
+    }
+    .modal {
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+    .building-name-error {
+      display: none;
+    }
+    .invalid .building-name-error {
+      display: block;
+    }
+    .spinner {
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }

@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SnapMatch Manager Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <style id="app-style">
+    :root {
+      --primary-color: #4361ee;
+      --success-color: #4caf50;
+      --warning-color: #ffc107;
+      --neutral-color: #9e9e9e;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9fafb;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .dashboard-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+    
+    .header-bar {
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
+    
+    .header-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin: 0;
+    }
+    
+    .filter-section {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .filters-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: flex-end;
+    }
+    
+    .filter-group {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .filter-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #333;
+    }
+    
+    .filter-control {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    .btn-refresh {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .btn-refresh:hover {
+      background-color: #3a56d4;
+    }
+    
+    .btn-apply {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      min-width: 120px;
+    }
+    
+    .btn-apply:hover {
+      background-color: #3a56d4;
+    }
+    
+    .receipts-table-container {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      overflow-x: auto;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .receipts-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .receipts-table th {
+      background-color: #f1f5f9;
+      padding: 12px 15px;
+      text-align: left;
+      font-weight: 600;
+      color: #333;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .receipts-table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: middle;
+    }
+    
+    .receipts-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .receipt-thumbnail {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    .receipt-thumbnail:hover {
+      transform: scale(1.05);
+    }
+    
+    .status-badge {
+      padding: 6px 10px;
+      border-radius: 15px;
+      font-size: 12px;
+      font-weight: 500;
+      display: inline-block;
+      text-align: center;
+    }
+    
+    .status-review {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    
+    .status-confirmed {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    .status-other {
+      background-color: #e9ecef;
+      color: #495057;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #6c757d;
+    }
+    
+    .empty-state i {
+      font-size: 48px;
+      margin-bottom: 15px;
+      color: #adb5bd;
+    }
+    
+    .empty-state p {
+      font-size: 16px;
+      margin: 10px 0 0;
+    }
+    
+    .loading-spinner {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    
+    .spinner-border {
+      color: var(--primary-color);
+      width: 3rem;
+      height: 3rem;
+    }
+    
+    .error-banner {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .error-banner i {
+      font-size: 18px;
+      margin-right: 10px;
+    }
+    
+    .error-banner button {
+      background: none;
+      border: none;
+      color: #721c24;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    @media (max-width: 768px) {
+      .filters-row {
+        flex-direction: column;
+      }
+      
+      .filter-group {
+        width: 100%;
+      }
+      
+      .header-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      
+      .btn-apply {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container my-4">
+    <!-- Header Bar -->
+    <div class="header-bar">
+      <h1 class="header-title">SnapMatch Manager Dashboard</h1>
+      <button id="refresh-btn" class="btn-refresh" aria-label="Refresh data">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
+    </div>
+    
+    <!-- Error Banner (hidden by default) -->
+    <div id="error-banner" class="error-banner" style="display: none;">
+      <div>
+        <i class="fas fa-exclamation-circle"></i>
+        <span>Failed to load receipts. Please try again.</span>
+      </div>
+      <button id="close-error" aria-label="Close error message">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <!-- Filters Section -->
+    <section class="filter-section">
+      <div class="filters-row">
+        <div class="filter-group">
+          <label for="status-filter" class="filter-label">Receipt Status</label>
+          <select id="status-filter" class="filter-control" aria-label="Filter by status">
+            <option value="">All</option>
+            <option value="needs_review">Needs Review</option>
+            <option value="confirmed">Confirmed</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label for="start-date" class="filter-label">Start Date</label>
+          <input type="text" id="start-date" class="filter-control datepicker" placeholder="Select start date" aria-label="Start date for filtering">
+        </div>
+        
+        <div class="filter-group">
+          <label for="end-date" class="filter-label">End Date</label>
+          <input type="text" id="end-date" class="filter-control datepicker" placeholder="Select end date" aria-label="End date for filtering">
+        </div>
+        
+        <div class="filter-group" style="flex: 0 0 auto; align-self: flex-end;">
+          <button id="apply-filters" class="btn-apply" aria-label="Apply selected filters">
+            Apply Filters
+          </button>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Receipts Table Section -->
+    <section class="receipts-table-container">
+      <table class="receipts-table" aria-label="Employee receipts">
+        <thead>
+          <tr>
+            <th scope="col">Receipt Image</th>
+            <th scope="col">Vendor</th>
+            <th scope="col">Total Amount</th>
+            <th scope="col">Date of Purchase</th>
+            <th scope="col">Building Name</th>
+            <th scope="col">Items Purchased</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody id="receipts-table-body">
+          <!-- Table rows will be dynamically inserted here -->
+        </tbody>
+      </table>
+      
+      <!-- Loading State -->
+      <div id="loading-state" class="loading-spinner">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>Loading receipts...</p>
+      </div>
+      
+      <!-- Empty State -->
+      <div id="empty-state" class="empty-state" style="display: none;">
+        <i class="fas fa-receipt"></i>
+        <h3>No receipts found</h3>
+        <p>Try adjusting your filters or check back later for new submissions.</p>
+      </div>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.js"></script>
+  <script id="app-script">
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize date pickers
+      flatpickr('.datepicker', {
+        dateFormat: 'Y-m-d',
+        allowInput: true
+      });
+      
+      // DOM elements
+      const receiptsTableBody = document.getElementById('receipts-table-body');
+      const loadingState = document.getElementById('loading-state');
+      const emptyState = document.getElementById('empty-state');
+      const errorBanner = document.getElementById('error-banner');
+      const refreshBtn = document.getElementById('refresh-btn');
+      const applyFiltersBtn = document.getElementById('apply-filters');
+      const closeErrorBtn = document.getElementById('close-error');
+      const statusFilter = document.getElementById('status-filter');
+      const startDateFilter = document.getElementById('start-date');
+      const endDateFilter = document.getElementById('end-date');
+      
+      // Event listeners
+      refreshBtn.addEventListener('click', fetchReceipts);
+      applyFiltersBtn.addEventListener('click', fetchReceipts);
+      closeErrorBtn.addEventListener('click', () => {
+        errorBanner.style.display = 'none';
+      });
+      
+      // Fetch receipts on page load
+      fetchReceipts();
+      
+      // Add this new function to handle status updates
+      function updateStatus(receiptId, newStatus) {
+        console.log(`Updating receipt ${receiptId} status to ${newStatus}`);
+        // In a real implementation, this would make an API call to update the status
+      }
+      
+      // Function to fetch receipts from API
+      function fetchReceipts() {
+        showLoadingState();
+        
+        // Build query parameters
+        const params = new URLSearchParams();
+        params.append('companyKey', 'demoCompanyKey');
+        
+        if (statusFilter.value) {
+          params.append('status', statusFilter.value);
+        }
+        
+        if (startDateFilter.value) {
+          params.append('startDate', startDateFilter.value);
+        }
+        
+        if (endDateFilter.value) {
+          params.append('endDate', endDateFilter.value);
+        }
+        
+        // Fetch data from real API
+        fetch(`http://localhost:3001/api/receipts?${params.toString()}`)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            // Store receipts data globally
+            window.receiptsData = data;
+            renderReceiptsTable(data);
+          })
+          .catch(error => {
+            showError();
+            console.error('Error fetching receipts:', error);
+          });
+      }
+      
+      // Function to render receipts table - updated to include items dropdown and status dropdown
+      function renderReceiptsTable(receipts) {
+        hideLoadingState();
+        
+        if (receipts.length === 0) {
+          showEmptyState();
+          return;
+        }
+        
+        hideEmptyState();
+        receiptsTableBody.innerHTML = '';
+        
+        receipts.forEach(receipt => {
+          const row = document.createElement('tr');
+          row.dataset.receiptId = receipt.id;
+          
+          // Calculate total from items
+          let calculatedTotal = 0;
+          if (receipt.items && receipt.items.length > 0) {
+            receipt.items.forEach(item => {
+              const itemPrice = typeof item === 'object' ? (parseFloat(item.price) || 0) : 0;
+              calculatedTotal += itemPrice;
+            });
+          }
+          
+          // Get the receipt total amount
+          const receiptTotal = parseFloat(receipt.amount || receipt.total || 0);
+          
+          // Check if there's a discrepancy between calculated total and receipt total
+          const hasDiscrepancy = Math.abs(calculatedTotal - receiptTotal) > 0.01;
+          
+          // Determine the status - override to needs_review if there's a price discrepancy
+          let receiptStatus = receipt.status;
+          if (hasDiscrepancy && receipt.items && receipt.items.length > 0) {
+            receiptStatus = 'needs_review';
+          }
+          
+          // Format status badge based on status
+          let statusBadgeClass = 'status-other';
+          if (receiptStatus === 'needs_review') {
+            statusBadgeClass = 'status-review';
+          } else if (receiptStatus === 'confirmed') {
+            statusBadgeClass = 'status-confirmed';
+          }
+          
+          // Format status text for display
+          const statusText = receiptStatus === 'needs_review' ? 'Needs Review' : 
+                            receiptStatus === 'confirmed' ? 'Confirmed' : receiptStatus;
+          
+          // Format currency - use total property instead of amount
+          const amount = receipt.amount || receipt.total || 0;
+          const formattedAmount = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+          }).format(amount);
+          
+          // Format date - use date property instead of purchaseDate if needed
+          const purchaseDate = new Date(receipt.purchaseDate || receipt.date);
+          const formattedDate = purchaseDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          });
+          
+          // Replace items dropdown with a View Items button
+          const viewItemsButton = `<button class="btn btn-sm btn-outline-primary view-items-btn" data-receipt-id="${receipt.id}">
+            View Items <i class="fas fa-chevron-down"></i>
+          </button>`;
+          
+          // Replace status dropdown with clickable status badge
+          const clickableStatusBadge = `
+            <span class="status-badge ${statusBadgeClass}" style="cursor: pointer;" 
+              onclick="toggleStatus(${receipt.id}, '${receiptStatus}', this)">
+              ${statusText}
+            </span>
+          `;
+          
+          row.innerHTML = `
+            <td>
+              <img src="${receipt.imageUrl}" alt="Receipt from ${receipt.vendor}" class="receipt-thumbnail" 
+                onclick="window.open('${receipt.imageUrl}', '_blank')">
+            </td>
+            <td>${receipt.vendor}</td>
+            <td>${formattedAmount}</td>
+            <td>${formattedDate}</td>
+            <td>${receipt.buildingName}</td>
+            <td>${viewItemsButton}</td>
+            <td>${clickableStatusBadge}</td>
+          `;
+          
+          receiptsTableBody.appendChild(row);
+        });
+        
+        // Add event listeners for view items buttons
+        document.querySelectorAll('.view-items-btn').forEach(button => {
+          button.addEventListener('click', function() {
+            const receiptId = this.getAttribute('data-receipt-id');
+            toggleItemsView(receiptId, this);
+          });
+        });
+        
+        // Make toggle functions globally available
+        window.toggleStatus = toggleStatus;
+      }
+      
+      // Function to toggle receipt status - fixed to update on every click
+      function toggleStatus(receiptId, currentStatus, element) {
+        // Toggle between needs_review and confirmed
+        const newStatus = currentStatus === 'needs_review' ? 'confirmed' : 'needs_review';
+        
+        // Update the visual status indicator
+        if (newStatus === 'needs_review') {
+          element.classList.remove('status-confirmed');
+          element.classList.add('status-review');
+          element.textContent = 'Needs Review';
+        } else {
+          element.classList.remove('status-review');
+          element.classList.add('status-confirmed');
+          element.textContent = 'Confirmed';
+        }
+        
+        // Update the onclick attribute with the new status to ensure it toggles properly next time
+        element.setAttribute('onclick', `toggleStatus(${receiptId}, '${newStatus}', this)`);
+        
+        // Call the existing updateStatus function with the new status
+        updateStatus(receiptId, newStatus);
+      }
+      
+      // Function to toggle items view - updated to check for price discrepancies
+      function toggleItemsView(receiptId, buttonElement) {
+        const row = buttonElement.closest('tr');
+        const existingDetailsRow = document.getElementById(`items-details-${receiptId}`);
+        
+        // Toggle chevron icon
+        const icon = buttonElement.querySelector('i');
+        
+        if (existingDetailsRow) {
+          // Hide details if already visible
+          existingDetailsRow.remove();
+          icon.className = 'fas fa-chevron-down';
+        } else {
+          // Show loading indicator
+          icon.className = 'fas fa-spinner fa-spin';
+          
+          // Get the receipt data from our stored array
+          findReceiptById(receiptId)
+            .then(receipt => {
+              if (!receipt || !receipt.items) {
+                icon.className = 'fas fa-chevron-down';
+                return;
+              }
+              
+              // Create details row
+              const detailsRow = document.createElement('tr');
+              detailsRow.id = `items-details-${receiptId}`;
+              detailsRow.className = 'items-details-row';
+              
+              // Calculate total from items
+              let calculatedTotal = 0;
+              receipt.items.forEach(item => {
+                const itemPrice = typeof item === 'object' ? (parseFloat(item.price) || 0) : 0;
+                calculatedTotal += itemPrice;
+              });
+              
+              // Get the receipt total amount
+              const receiptTotal = parseFloat(receipt.amount || receipt.total || 0);
+                console.log(typeof calculatedTotal, typeof receiptTotal);
+                console.log(calculatedTotal, receiptTotal);
+
+              // Check if there's a discrepancy between calculated total and receipt total
+              const hasDiscrepancy = Math.abs(calculatedTotal - receiptTotal) > receiptTotal * 0.08; // 8% threshold for discrepancy, e.g. taxes
+              
+              // If there's a discrepancy, mark the receipt for review ONLY if not already confirmed
+              if (hasDiscrepancy && receipt.status !== 'status-confirmed') {
+                console.log(receipt.status)
+                // Find the status badge in the current row
+                const statusBadge = row.querySelector('.status-badge');
+                if (statusBadge) {
+                  // Update the status badge to "needs review"
+                  statusBadge.className = 'status-badge status-review';
+                  statusBadge.textContent = 'Needs Review';
+                  statusBadge.setAttribute('onclick', `toggleStatus(${receiptId}, 'needs_review', this)`);
+                  
+                  // Call the existing updateStatus function with the new status
+                  updateStatus(receiptId, 'needs_review');
+                }
+              }
+              
+              // Create table of items with prices
+              let itemsTableHtml = `
+                <td colspan="7">
+                  <div class="p-3">
+                    <h6>Items Purchased:</h6>
+                    <table class="table table-sm">
+                      <thead>
+                        <tr>
+                          <th>Item Name</th>
+                          <th>Price</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+              `;
+              
+              receipt.items.forEach(item => {
+                // Use item price if available, otherwise generate random price
+                const price = item.price ? item.price : (Math.random() * 100).toFixed(2);
+                const formattedPrice = new Intl.NumberFormat('en-US', {
+                  style: 'currency',
+                  currency: 'USD'
+                }).format(price);
+                
+                itemsTableHtml += `
+                  <tr>
+                    <td>${typeof item === 'object' ? item.name : item}</td>
+                    <td>${formattedPrice}</td>
+                  </tr>
+                `;
+              });
+              
+              // Add calculated total row with highlighting if there's a discrepancy
+              const totalRowClass = hasDiscrepancy ? 'table-warning' : '';
+              itemsTableHtml += `
+                  <tr class="${totalRowClass}">
+                    <td><strong>Calculated Total:</strong></td>
+                    <td><strong>${new Intl.NumberFormat('en-US', {
+                      style: 'currency',
+                      currency: 'USD'
+                    }).format(calculatedTotal)}</strong></td>
+                  </tr>
+                  <tr class="${totalRowClass}">
+                    <td><strong>Receipt Total:</strong></td>
+                    <td><strong>${new Intl.NumberFormat('en-US', {
+                      style: 'currency',
+                      currency: 'USD'
+                    }).format(receiptTotal)}</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+              ${hasDiscrepancy ? '<div class="alert alert-warning mt-2">Discrepancy detected between item prices and total amount.</div>' : ''}
+            </div>
+          </td>
+        `;
+              
+              detailsRow.innerHTML = itemsTableHtml;
+              row.parentNode.insertBefore(detailsRow, row.nextSibling);
+              icon.className = 'fas fa-chevron-up';
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              icon.className = 'fas fa-chevron-down';
+            });
+        }
+      }
+      
+      // Helper function to find receipt by ID
+      function findReceiptById(id) {
+        return new Promise((resolve, reject) => {
+          if (!window.receiptsData) {
+            reject('No receipts data available');
+            return;
+          }
+          
+          const receipt = window.receiptsData.find(r => r.id == id);
+          if (receipt) {
+            resolve(receipt);
+          } else {
+            reject('Receipt not found');
+          }
+        });
+      }
+      
+      // UI state management functions
+      function showLoadingState() {
+        loadingState.style.display = 'block';
+        emptyState.style.display = 'none';
+        receiptsTableBody.innerHTML = '';
+        errorBanner.style.display = 'none';
+      }
+      
+      function hideLoadingState() {
+        loadingState.style.display = 'none';
+      }
+      
+      function showEmptyState() {
+        emptyState.style.display = 'block';
+      }
+      
+      function hideEmptyState() {
+        emptyState.style.display = 'none';
+      }
+      
+      function showError() {
+        errorBanner.style.display = 'flex';
+        hideLoadingState();
+      }
+    });
+  </script>
+</body>
+</html>
