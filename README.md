@@ -3,12 +3,12 @@ Ease-of-use scanner for receipts that allows businesses to comfortably keep trac
 
 ## Overview
 
-This web application is designed for companies that manage home and apartment upgrades across multiple buildings. It streamlines the process of uploading, reviewing, and approving receipts submitted by purchasers, while keeping everything organized by building.
+This web application is designed for companies that hhave to manage tricky detailed financials. It streamlines the process of uploading, reviewing, and approving receipts submitted by purchasers, while keeping everything organized.
 
 ## Key Features
 
 - **Purchaser Dashboard**  
-  Purchasers can easily upload receipts for home or apartment upgrades using a web dashboard. When uploading, they can select the building the receipt is associated with for better organization. 
+  Purchasers can easily upload receipts= using a web dashboard. When uploading, they can select the building the receipt is associated with for better organization. 
 
 - **Receipt Item Extraction (OCR)**  
   Uploaded receipts are processed using Tesseract OCR to automatically extract individual line items from the images.
@@ -24,11 +24,11 @@ This web application is designed for companies that manage home and apartment up
 
 ## Tech Stack
 
-- Frontend (Purchaser Dashboard): (Specify your frontend framework, e.g., React)
-- Backend (Manager Portal): (Specify backend, e.g., Node.js, Django, with secure login)
+- Frontend: Purchaser Dashboard, Manager Portal
+- Backend: node.js database
 - OCR: Tesseract OCR
-- Database: (e.g., PostgreSQL, MongoDB)
-- Authentication: (e.g., JWT, OAuth, or session-based auth)
+- Database: SQLite
+- Authentication: User-based auth and Company-based auth.
 
 ## Getting Started
 
@@ -39,21 +39,15 @@ This web application is designed for companies that manage home and apartment up
 
 2. Install dependencies  
    ```bash
-   cd receipt-management-app
+   cd backend_db
    npm install
    ```
 
 3. Start the development server  
    ```bash
-   npm run dev
+   node main.js
    ```
 
-4. Set up environment variables for database, authentication, and OCR configuration (see `.env.example`)
-
-## Future Improvements
-
-- Advanced filtering and reporting by building or date range
-- Email notifications for status updates
-- Role-based access control (admin vs manager)
-- Improved OCR accuracy with custom training data
-- Capability to submit the receipts using the phone app from a cell phone
+Run index.html through Live Server. The project is currently hosted on localhost, so backends are not shared.
+4. Set up OpenAI API key through
+```const OPENAI_API_KEY = 'ENTER KEY HERE'; ``` in ./backend_db/main.js
