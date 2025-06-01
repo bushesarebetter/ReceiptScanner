@@ -34,7 +34,7 @@ This web application is designed for companies that hhave to manage tricky detai
 
 1. Clone the repository  
    ```bash
-   git clone https://github.com/your-org/receipt-management-app.git
+   git clone https://github.com/bushesarebetter/ReceiptScanner.git
    ```
 
 2. Install dependencies  
