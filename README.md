@@ -49,5 +49,7 @@ This web application is designed for companies that hhave to manage tricky detai
    ```
 
 Run index.html through Live Server. The project is currently hosted on localhost, so backends are not shared.
+
+
 4. Set up OpenAI API key through
 ```const OPENAI_API_KEY = 'ENTER KEY HERE'; ``` in ./backend_db/main.js
